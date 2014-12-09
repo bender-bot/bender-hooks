@@ -1,0 +1,9 @@
+.cache/
+.project
+.pydevproject
+__pycache__/
+*.egg-info/
+*.pyc
+docs/_build/
+.tox/
+.coverage
