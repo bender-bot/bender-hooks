@@ -1,3 +1,4 @@
+from bender_hooks import HookError
 import bender_hooks as hooks
 import pytest
 
@@ -7,9 +8,17 @@ def test_simple_hook():
     def my_spec(x, y):
         """spec docs"""
 
+    def my_spec_2():
+        """spec docs"""
+
     dec = hooks.make_decorator(my_spec)
+    dec_2 = hooks.make_decorator(my_spec_2)
 
     class Impl(object):
+
+        def my_func(self):
+            return 'my_func'
+
         @dec
         def my_hook_1(self, x, y):
             assert (x, y) == (1, 20)
@@ -24,13 +33,22 @@ def test_simple_hook():
         def my_hook_3(self):
             return 'my_hook_3'
 
+    @dec_2
+    def my_hook_4():
+        return 'my_hook_4'
+
     assert Impl.my_hook_1.hook_name == 'my_spec'
     assert Impl.my_hook_2.hook_name == 'my_spec'
     assert Impl.my_hook_3.hook_name == 'my_spec'
+
     impl = Impl()
     assert hooks.call(impl.my_hook_1, x=1, y=20) == 'my_hook_1'
     assert hooks.call(impl.my_hook_2, x=1, y=20) == 'my_hook_2'
     assert hooks.call(impl.my_hook_3, x=1, y=20) == 'my_hook_3'
+    assert hooks.call(my_hook_4, x=1, y=20) == 'my_hook_4'
+
+    with pytest.raises(HookError):
+        hooks.call(impl.my_func)
 
 
 def test_hook_with_input():
