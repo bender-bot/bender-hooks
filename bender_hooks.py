@@ -70,7 +70,7 @@ def make_decorator(hook_decl, inputs=()):
         def decorator(*args):
             def inner(f):
                 wrapped = make_decorated(f)
-                wrapped.inputs = {k: args[i] for (i, k) in enumerate(inputs)}
+                wrapped.inputs = dict((k, args[i]) for (i, k) in enumerate(inputs))
                 return wrapped
             return inner
     else:
@@ -120,7 +120,7 @@ def call(hook, **kwargs):
         raise HookError('%s is not a hook' % hook)
     if hook.spec.args:
         accepts_kwargs = set(hook.spec.args).intersection(kwargs)
-        new_kwargs = {k: kwargs[k] for k in accepts_kwargs}
+        new_kwargs = dict((k, kwargs[k]) for k in accepts_kwargs)
     else:
         new_kwargs = {}
     return hook(**new_kwargs)
